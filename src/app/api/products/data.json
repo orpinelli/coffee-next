@@ -5,9 +5,9 @@
       "title": "Coffee 1",
       "slug": "coffee-1",
       "price": 129,
-      "image": "/graos-de-cafe.pngg",
+      "image": "/graos-de-cafe.png",
       "description": "Uma seleção impecável de grãos combinada com as técnicas mais modernas de torra para oferecer um sabor bem equilibrado",
-      "featured": true
+      "featured": false
     },
     {
       "id": 2,
@@ -34,7 +34,7 @@
       "price": 99,
       "image": "/graos-de-cafe.png",
       "description": "Uma seleção impecável de grãos combinada com as técnicas mais modernas de torra para oferecer um sabor bem equilibrado",
-      "featured": false
+      "featured": true
     },
     {
       "id": 5,
