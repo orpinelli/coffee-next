@@ -4,7 +4,9 @@ import { api } from "@/data/api";
 import { Product } from "@/data/types/product";
 
 async function getFeaturedProducts(): Promise<Product[]> {
-  const response = await api("/products/featured");
+  const response = await api("/products/featured", {
+    cache: "no-cache",
+  });
   const products = await response.json();
 
   return products;
@@ -12,7 +14,7 @@ async function getFeaturedProducts(): Promise<Product[]> {
 
 export default async function Home() {
   const [highlightedProduct, ...otherProducts] = await getFeaturedProducts();
-  console.log(highlightedProduct.image, "img");
+  console.log(highlightedProduct.title, "img");
   return (
     <div className="grid max-h-[860px] grid-cols-9 grid-rows-6 gap-6">
       <Link
@@ -22,8 +24,8 @@ export default async function Home() {
         <Image
           src={highlightedProduct.image}
           className="group-hover:scale-105 trasnsition-trasnsform duration-500 rounded-lg"
-          width={920}
-          height={930}
+          width={1820}
+          height={1830}
           quality={100}
           alt=""
         />
