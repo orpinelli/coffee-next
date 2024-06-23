@@ -5,7 +5,10 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Coffe Next",
+  title: {
+    template: "%s | Next Coffe",
+    default: "Next Coffe",
+  },
   description: "Loja de cafe para praticar next",
 };
 

@@ -1,27 +1,66 @@
+import { api } from "@/data/api";
+import { Product } from "@/data/types/product";
 import Image from "next/image";
 
-export default function ProductPage() {
+interface ProductPros {
+  params: {
+    slug: string;
+  };
+}
+
+const ONE_HOUR_FOR_REVALIDATION = 60 * 60;
+
+async function getProduct(slug: string): Promise<Product> {
+  const response = await api(`/products/${slug}`, {
+    next: {
+      revalidate: ONE_HOUR_FOR_REVALIDATION,
+    },
+  });
+  const products = await response.json();
+
+  return products;
+}
+
+export async function generateMetadata({ params }: ProductPros) {
+  const product = await getProduct(params.slug);
+  return {
+    title: product.title,
+  };
+}
+
+export default async function ProductPage({ params }: ProductPros) {
+  const INSTALLMENT_AMOUT = 12;
+  const product = await getProduct(params.slug);
+
   return (
     <div className="relative grid max-h-[860px] grid-cols-3">
       <div className="col-span-2 overflow-hidden">
         <Image
-          src="/graos-de-cafe.png"
+          src={product.image}
           alt=""
-          width={1000}
-          height={1000}
+          width={1200}
+          height={1200}
           quality={100}
         />
       </div>
       <div className="flex flex-col justify-center px-12 ">
-        <h1 className="text-3x1 font-bold leading-tight">Saco de Cafe</h1>
+        <h1 className="text-3x1 font-bold leading-tight">{product.title}</h1>
         <p className="mt-2 leading-relaxed text-zinc-400">
-          Descricao do saco de cafe
+          {product.description}
         </p>
         <div className="mt-8 flex items-center gap-3 ">
           <span className="inline-block rounded-full bg-amber-400 font-semibold px-5 py-2.5">
-            124
+            {product.price.toLocaleString("pt-br", {
+              style: "currency",
+              currency: "BRL",
+            })}
           </span>
-          <span className="text-sm text-zinc-400">10x s/ juros de 12,4</span>
+          <span className="text-sm text-zinc-400">
+            {(product.price / INSTALLMENT_AMOUT).toLocaleString("pt-br", {
+              style: "currency",
+              currency: "BRL",
+            })}
+          </span>
         </div>
 
         <div className="mt-8 space-y-4">

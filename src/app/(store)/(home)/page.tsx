@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { api } from "@/data/api";
 import { Product } from "@/data/types/product";
+import type { Metadata } from "next";
 
 async function getFeaturedProducts(): Promise<Product[]> {
   const response = await api("/products/featured", {
@@ -11,6 +12,10 @@ async function getFeaturedProducts(): Promise<Product[]> {
 
   return products;
 }
+
+export const metadata: Metadata = {
+  title: "Home",
+};
 
 export default async function Home() {
   const [highlightedProduct, ...otherProducts] = await getFeaturedProducts();
@@ -24,8 +29,8 @@ export default async function Home() {
         <Image
           src={highlightedProduct.image}
           className="group-hover:scale-110 trasnsition-trasnsform duration-500 rounded-lg"
-          width={820}
-          height={830}
+          width={1020}
+          height={1030}
           quality={100}
           alt=""
         />
@@ -51,7 +56,7 @@ export default async function Home() {
               src={product.image}
               className="group-hover:scale-105 trasnsition-trasnsform duration-500"
               width={920}
-              height={920}
+              height={900}
               quality={100}
               alt=""
             />
