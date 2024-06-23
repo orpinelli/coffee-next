@@ -5,9 +5,9 @@ import { Product } from "@/data/types/product";
 import type { Metadata } from "next";
 
 async function getFeaturedProducts(): Promise<Product[]> {
-  const response = await api("/products/featured", {
-    cache: "no-cache",
-  });
+    const response = await api("/products/featured", {
+      cache: "no-cache",
+    });
   const products = await response.json();
 
   return products;

@@ -28,6 +28,15 @@ export async function generateMetadata({ params }: ProductPros) {
   };
 }
 
+export async function generateStaticParams() {
+  const response = await api("/products/featured", {});
+  const products: Product[] = await response.json();
+
+  return products.map((product) => {
+    return { slug: product.slug };
+  });
+}
+
 export default async function ProductPage({ params }: ProductPros) {
   const INSTALLMENT_AMOUT = 12;
   const product = await getProduct(params.slug);
