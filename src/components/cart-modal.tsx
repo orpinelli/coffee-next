@@ -28,8 +28,8 @@ export function CartModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
   }, []);
 
   return (
-    <div className="fixed inset-0  flex justify-end items-start pt-20 pr-4">
-      <div className="modal-content relative bg-zinc-200 p-4 rounded shadow-lg w-[400px]">
+    <div className="fixed inset-0  flex justify-end items-start pt-20 pr-4 z-99">
+      <div className="modal-content relative bg-zinc-200 p-4 rounded shadow-lg w-[400px] z-50">
         <h2 className="text-xl font-bold mb-4 text-black">Carrinho</h2>
         <button onClick={onClose} className="absolute top-2 right-2 text-black">X</button>
         <ul>

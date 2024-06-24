@@ -5,7 +5,7 @@ import { CartWidget } from "./cart-widget";
 
 export default function Header() {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between z-40">
       <div className="flex items-center gap-5">
         <Link href="/" className="text-2x1 font-extrabold text-white">
           Coffee Next

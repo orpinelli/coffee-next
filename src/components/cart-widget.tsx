@@ -27,7 +27,7 @@ export function CartWidget() {
 
   return (
     <div className="relative">
-      <div className="flex items-center gap-2 cursor-pointer" onClick={handleOpenModal}>
+      <div className="flex items-center z-50 gap-2 cursor-pointer" onClick={handleOpenModal}>
         <ShoppingBag className="h-4 w-4" />
         <span className="text-sm">Cart ({totalItems})</span>
       </div>
