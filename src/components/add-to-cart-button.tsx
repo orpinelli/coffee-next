@@ -4,13 +4,14 @@ import { useCart } from "@/context/cart-context";
 
 interface AddToCartButtonProps {
   productId: number;
+  title: string;
 }
 
-export function AddToCartButton({ productId }: AddToCartButtonProps) {
+export function AddToCartButton({ productId, title }: AddToCartButtonProps) {
   const { addToCart } = useCart();
 
   function handleAddProductToCart() {
-    addToCart(productId);
+    addToCart(productId, title);
   }
 
   return (
@@ -19,7 +20,7 @@ export function AddToCartButton({ productId }: AddToCartButtonProps) {
       onClick={handleAddProductToCart}
       className="mt-8 flex h-12 items-center justify-center rounded-full bg-orange-500 font-semibold text-white"
     >
-      Adcionar ao Carrinho
+      Adicionar ao Carrinho
     </button>
   );
 }

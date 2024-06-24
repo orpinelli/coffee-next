@@ -103,7 +103,7 @@ export default async function ProductPage({ params }: ProductPros) {
             </button>
           </div>
         </div>
-        <AddToCartButton productId={product.id} />
+        <AddToCartButton productId={product.id} title={product.title} />
       </div>
     </div>
   );
