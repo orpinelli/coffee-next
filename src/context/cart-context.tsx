@@ -12,9 +12,13 @@ interface CartItems {
 interface CartContextType {
   items: CartItems[];
   addToCart: (productId: number, title: string) => void;
+  increaseQuantity: (productId: number) => void;
+  decreaseQuantity: (productId: number) => void;
+  removeFromCart: (productId: number) => void;
   openCartModal: () => void;
   closeCartModal: () => void;
 }
+
 const CartContext = createContext({} as CartContextType);
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -40,6 +44,32 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setIsModalOpen(true);
   }
 
+  function increaseQuantity(productId: number) {
+    setCartItems((state) =>
+      state.map((item) =>
+        item.productId === productId
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      )
+    );
+  }
+
+  function decreaseQuantity(productId: number) {
+    setCartItems((state) =>
+      state
+        .map((item) =>
+          item.productId === productId
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
+  }
+
+  function removeFromCart(productId: number) {
+    setCartItems((state) => state.filter((item) => item.productId !== productId));
+  }
+
   function openCartModal() {
     setIsModalOpen(true);
   }
@@ -49,7 +79,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <CartContext.Provider value={{ items: cartItems, addToCart, openCartModal, closeCartModal }}>
+    <CartContext.Provider
+      value={{
+        items: cartItems,
+        addToCart,
+        increaseQuantity,
+        decreaseQuantity,
+        removeFromCart,
+        openCartModal,
+        closeCartModal,
+      }}
+    >
       {children}
       {isModalOpen && <CartModal isOpen={isModalOpen} onClose={closeCartModal} />}
     </CartContext.Provider>
