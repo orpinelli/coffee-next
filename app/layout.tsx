@@ -16,7 +16,7 @@ const robotoSlab = Roboto_Slab({
 })
 
 export const metadata: Metadata = {
-  title: "PradooBuild - Materiais de Construção e Ferramentas",
+  title: "Comercial Prado - Materiais de Construção e Ferramentas",
   description:
     "Sua loja especializada em materiais de construção, ferramentas e equipamentos profissionais. Os melhores preços e qualidade garantida.",
   generator: "v0.app",

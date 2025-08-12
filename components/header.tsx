@@ -21,7 +21,7 @@ export function Header() {
             </div>
             <div className="flex items-center gap-2">
               <Mail className="h-4 w-4" />
-              <span>contato@pradoo.com.br</span>
+              <span>contato@prado.com.br</span>
             </div>
           </div>
           <div className="hidden md:block">
@@ -36,7 +36,7 @@ export function Header() {
           {/* Logo */}
           <div className="flex items-center">
             <h1 className="text-2xl font-bold text-orange-600">
-              Pradoo<span className="text-slate-700">Build</span>
+              Comercial<span className="text-slate-700">Prado</span>
             </h1>
           </div>
 
