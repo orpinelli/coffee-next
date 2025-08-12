@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Star, ShoppingCart } from "lucide-react"
+import Link from "next/link"
 
 const products = [
   {
@@ -91,11 +92,13 @@ export function FeaturedProducts() {
             >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
-                  <img
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
-                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                  <Link href={`/produto/${product.id}`}>
+                    <img
+                      src={product.image || "/placeholder.svg"}
+                      alt={product.name}
+                      className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
+                    />
+                  </Link>
                   <Badge className={`absolute top-3 left-3 ${product.badgeColor} text-white`}>{product.badge}</Badge>
                   {product.originalPrice && (
                     <Badge className="absolute top-3 right-3 bg-red-500 text-white">
@@ -105,9 +108,11 @@ export function FeaturedProducts() {
                 </div>
 
                 <div className="p-6">
-                  <h3 className="font-semibold text-slate-900 mb-2 line-clamp-2 group-hover:text-orange-600 transition-colors">
-                    {product.name}
-                  </h3>
+                  <Link href={`/produto/${product.id}`}>
+                    <h3 className="font-semibold text-slate-900 mb-2 line-clamp-2 group-hover:text-orange-600 transition-colors cursor-pointer">
+                      {product.name}
+                    </h3>
+                  </Link>
 
                   <div className="flex items-center gap-2 mb-3">
                     <div className="flex items-center">
@@ -151,8 +156,9 @@ export function FeaturedProducts() {
             size="lg"
             variant="outline"
             className="border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white bg-transparent"
+            asChild
           >
-            Ver Todos os Produtos
+            <Link href="/categoria/ferramentas">Ver Todos os Produtos</Link>
           </Button>
         </div>
       </div>

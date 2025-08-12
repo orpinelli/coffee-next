@@ -5,6 +5,7 @@ import { Search, ShoppingCart, Menu, X, Phone, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import Link from "next/link"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -21,7 +22,7 @@ export function Header() {
             </div>
             <div className="flex items-center gap-2">
               <Mail className="h-4 w-4" />
-              <span>contato@prado.com.br</span>
+              <span>contato@pradoo.com.br</span>
             </div>
           </div>
           <div className="hidden md:block">
@@ -35,9 +36,11 @@ export function Header() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-orange-600">
-              Comercial<span className="text-slate-700">Prado</span>
-            </h1>
+            <Link href="/">
+              <h1 className="text-2xl font-bold text-orange-600 cursor-pointer hover:text-orange-700 transition-colors">
+                Pradoo<span className="text-slate-700">Build</span>
+              </h1>
+            </Link>
           </div>
 
           {/* Search bar - Desktop */}
@@ -56,9 +59,11 @@ export function Header() {
 
           {/* Cart and Menu */}
           <div className="flex items-center gap-4">
-            <Button variant="outline" className="relative bg-transparent">
-              <ShoppingCart className="h-5 w-5" />
-              <Badge className="absolute -top-2 -right-2 bg-orange-600 text-white">3</Badge>
+            <Button variant="outline" className="relative bg-transparent" asChild>
+              <Link href="/carrinho">
+                <ShoppingCart className="h-5 w-5" />
+                <Badge className="absolute -top-2 -right-2 bg-orange-600 text-white">3</Badge>
+              </Link>
             </Button>
 
             {/* Mobile menu button */}
@@ -91,39 +96,39 @@ export function Header() {
         <nav className={`${isMenuOpen ? "block" : "hidden"} md:block mt-4`}>
           <ul className="flex flex-col md:flex-row gap-2 md:gap-8 text-slate-700">
             <li>
-              <a href="#" className="hover:text-orange-600 font-medium">
+              <Link href="/" className="hover:text-orange-600 font-medium transition-colors">
                 Início
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-orange-600 font-medium">
+              <Link href="/categoria/ferramentas" className="hover:text-orange-600 font-medium transition-colors">
                 Ferramentas
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-orange-600 font-medium">
+              <Link href="/categoria/materiais" className="hover:text-orange-600 font-medium transition-colors">
                 Materiais
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-orange-600 font-medium">
+              <Link href="/categoria/eletrica" className="hover:text-orange-600 font-medium transition-colors">
                 Elétrica
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-orange-600 font-medium">
+              <Link href="/categoria/hidraulica" className="hover:text-orange-600 font-medium transition-colors">
                 Hidráulica
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-orange-600 font-medium">
+              <Link href="/categoria/tintas" className="hover:text-orange-600 font-medium transition-colors">
                 Tintas
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-orange-600 font-medium">
+              <Link href="/ofertas" className="hover:text-orange-600 font-medium transition-colors">
                 Ofertas
-              </a>
+              </Link>
             </li>
           </ul>
         </nav>

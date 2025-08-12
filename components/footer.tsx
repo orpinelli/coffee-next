@@ -7,7 +7,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <h3 className="text-2xl font-bold text-orange-500 mb-4">Comercial Prado</h3>
+            <h3 className="text-2xl font-bold text-orange-500 mb-4">PradooBuild</h3>
             <p className="text-slate-300 mb-4 leading-relaxed">
               Sua loja especializada em materiais de construção, ferramentas e equipamentos profissionais.
             </p>
@@ -107,7 +107,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-slate-700 mt-8 pt-8 text-center">
-          <p className="text-slate-400">© 2024 Comercial Prado. Todos os direitos reservados.</p>
+          <p className="text-slate-400">© 2024 PradooBuild. Todos os direitos reservados.</p>
         </div>
       </div>
     </footer>
