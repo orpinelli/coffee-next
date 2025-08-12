@@ -54,7 +54,7 @@ export function Header() {
           <div className="flex items-center">
             <Link href="/">
               <h1 className="text-2xl font-bold text-orange-600 cursor-pointer hover:text-orange-700 transition-colors">
-                Pradoo<span className="text-slate-700">Build</span>
+               Comercial<span className="text-slate-700">prado</span>
               </h1>
             </Link>
           </div>
