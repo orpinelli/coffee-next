@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,7 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
-import { User, MapPin, Truck, CreditCard, Smartphone, FileText, Shield } from "lucide-react"
+import { useAuth } from "@/contexts/auth-context"
+import { useCart } from "@/contexts/cart-context"
+import { User, MapPin, Truck, Shield } from "lucide-react"
 
 const states = [
   "AC",
@@ -67,54 +70,30 @@ const shippingOptions = [
   },
 ]
 
-const paymentMethods = [
-  {
-    id: "credit",
-    name: "Cartão de Crédito",
-    description: "Visa, Mastercard, Elo",
-    icon: CreditCard,
-  },
-  {
-    id: "pix",
-    name: "PIX",
-    description: "Pagamento instantâneo",
-    icon: Smartphone,
-  },
-  {
-    id: "boleto",
-    name: "Boleto Bancário",
-    description: "Vencimento em 3 dias úteis",
-    icon: FileText,
-  },
-]
-
 export function CheckoutForm() {
   const [currentStep, setCurrentStep] = useState(1)
+  const { user, updateProfile } = useAuth()
+  const { items } = useCart()
+  const router = useRouter()
+
   const [formData, setFormData] = useState({
     // Dados pessoais
-    name: "",
-    email: "",
-    phone: "",
-    cpf: "",
+    name: user?.name || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    cpf: user?.cpf || "",
 
     // Endereço
-    cep: "",
-    street: "",
-    number: "",
-    complement: "",
-    neighborhood: "",
-    city: "",
-    state: "",
+    cep: user?.address?.zipCode || "",
+    street: user?.address?.street || "",
+    number: user?.address?.number || "",
+    complement: user?.address?.complement || "",
+    neighborhood: user?.address?.neighborhood || "",
+    city: user?.address?.city || "",
+    state: user?.address?.state || "",
 
     // Frete
     shipping: "",
-
-    // Pagamento
-    payment: "",
-    cardNumber: "",
-    cardName: "",
-    cardExpiry: "",
-    cardCvv: "",
 
     // Termos
     acceptTerms: false,
@@ -145,7 +124,7 @@ export function CheckoutForm() {
   }
 
   const nextStep = () => {
-    if (currentStep < 3) {
+    if (currentStep < 2) {
       setCurrentStep(currentStep + 1)
     }
   }
@@ -158,15 +137,45 @@ export function CheckoutForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Processar pedido
-    console.log("Processando pedido:", formData)
+
+    // Update user profile with address data
+    if (user) {
+      updateProfile({
+        name: formData.name,
+        phone: formData.phone,
+        cpf: formData.cpf,
+        address: {
+          street: formData.street,
+          number: formData.number,
+          complement: formData.complement,
+          neighborhood: formData.neighborhood,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.cep,
+        },
+      })
+    }
+
+    // Redirect to payment page
+    router.push("/pagamento")
+  }
+
+  // Redirect if not logged in or cart is empty
+  if (!user || items.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-600">
+          {!user ? "Você precisa estar logado para continuar." : "Seu carrinho está vazio."}
+        </p>
+      </div>
+    )
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Progress Steps */}
       <div className="flex items-center justify-between mb-8">
-        {[1, 2, 3].map((step) => (
+        {[1, 2].map((step) => (
           <div key={step} className="flex items-center">
             <div
               className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
@@ -177,10 +186,10 @@ export function CheckoutForm() {
             </div>
             <div className="ml-3">
               <p className={`text-sm font-medium ${step <= currentStep ? "text-orange-600" : "text-slate-600"}`}>
-                {step === 1 ? "Dados Pessoais" : step === 2 ? "Entrega" : "Pagamento"}
+                {step === 1 ? "Dados Pessoais" : "Entrega"}
               </p>
             </div>
-            {step < 3 && <div className={`w-16 h-0.5 mx-4 ${step < currentStep ? "bg-orange-600" : "bg-slate-200"}`} />}
+            {step < 2 && <div className={`w-16 h-0.5 mx-4 ${step < currentStep ? "bg-orange-600" : "bg-slate-200"}`} />}
           </div>
         ))}
       </div>
@@ -215,6 +224,7 @@ export function CheckoutForm() {
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   placeholder="seu@email.com"
                   required
+                  disabled
                 />
               </div>
             </div>
@@ -342,70 +352,34 @@ export function CheckoutForm() {
 
       {/* Step 2: Entrega */}
       {currentStep === 2 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Truck className="h-5 w-5" />
-              Opções de Entrega
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <RadioGroup value={formData.shipping} onValueChange={(value) => handleInputChange("shipping", value)}>
-              <div className="space-y-4">
-                {shippingOptions.map((option) => {
-                  const IconComponent = option.icon
-                  return (
-                    <div
-                      key={option.id}
-                      className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-slate-50"
-                    >
-                      <RadioGroupItem value={option.id} id={option.id} />
-                      <IconComponent className="h-5 w-5 text-slate-600" />
-                      <div className="flex-1">
-                        <Label htmlFor={option.id} className="font-medium cursor-pointer">
-                          {option.name}
-                        </Label>
-                        <p className="text-sm text-slate-600">{option.description}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium">R$ {option.price.toFixed(2).replace(".", ",")}</p>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </RadioGroup>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Step 3: Pagamento */}
-      {currentStep === 3 && (
         <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
-                Forma de Pagamento
+                <Truck className="h-5 w-5" />
+                Opções de Entrega
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <RadioGroup value={formData.payment} onValueChange={(value) => handleInputChange("payment", value)}>
+              <RadioGroup value={formData.shipping} onValueChange={(value) => handleInputChange("shipping", value)}>
                 <div className="space-y-4">
-                  {paymentMethods.map((method) => {
-                    const IconComponent = method.icon
+                  {shippingOptions.map((option) => {
+                    const IconComponent = option.icon
                     return (
                       <div
-                        key={method.id}
+                        key={option.id}
                         className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-slate-50"
                       >
-                        <RadioGroupItem value={method.id} id={method.id} />
+                        <RadioGroupItem value={option.id} id={option.id} />
                         <IconComponent className="h-5 w-5 text-slate-600" />
                         <div className="flex-1">
-                          <Label htmlFor={method.id} className="font-medium cursor-pointer">
-                            {method.name}
+                          <Label htmlFor={option.id} className="font-medium cursor-pointer">
+                            {option.name}
                           </Label>
-                          <p className="text-sm text-slate-600">{method.description}</p>
+                          <p className="text-sm text-slate-600">{option.description}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium">R$ {option.price.toFixed(2).replace(".", ",")}</p>
                         </div>
                       </div>
                     )
@@ -414,59 +388,6 @@ export function CheckoutForm() {
               </RadioGroup>
             </CardContent>
           </Card>
-
-          {/* Dados do Cartão */}
-          {formData.payment === "credit" && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Dados do Cartão</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="cardNumber">Número do Cartão *</Label>
-                  <Input
-                    id="cardNumber"
-                    value={formData.cardNumber}
-                    onChange={(e) => handleInputChange("cardNumber", e.target.value)}
-                    placeholder="0000 0000 0000 0000"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="cardName">Nome no Cartão *</Label>
-                  <Input
-                    id="cardName"
-                    value={formData.cardName}
-                    onChange={(e) => handleInputChange("cardName", e.target.value)}
-                    placeholder="Nome como está no cartão"
-                    required
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="cardExpiry">Validade *</Label>
-                    <Input
-                      id="cardExpiry"
-                      value={formData.cardExpiry}
-                      onChange={(e) => handleInputChange("cardExpiry", e.target.value)}
-                      placeholder="MM/AA"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="cardCvv">CVV *</Label>
-                    <Input
-                      id="cardCvv"
-                      value={formData.cardCvv}
-                      onChange={(e) => handleInputChange("cardCvv", e.target.value)}
-                      placeholder="123"
-                      required
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Termos e Condições */}
           <Card>
@@ -512,14 +433,14 @@ export function CheckoutForm() {
           Voltar
         </Button>
 
-        {currentStep < 3 ? (
+        {currentStep < 2 ? (
           <Button type="button" onClick={nextStep} className="bg-orange-600 hover:bg-orange-700">
             Continuar
           </Button>
         ) : (
           <Button type="submit" className="bg-green-600 hover:bg-green-700" disabled={!formData.acceptTerms}>
             <Shield className="h-4 w-4 mr-2" />
-            Finalizar Pedido
+            Ir para Pagamento
           </Button>
         )}
       </div>

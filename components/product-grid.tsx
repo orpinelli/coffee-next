@@ -4,8 +4,10 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useCart } from "@/contexts/cart-context"
 import { Star, ShoppingCart, Heart, Eye } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
 
 // Mock data - em um app real, isso viria de uma API
 const mockProducts = [
@@ -122,6 +124,7 @@ interface ProductGridProps {
 
 export function ProductGrid({ category, searchParams }: ProductGridProps) {
   const [currentPage, setCurrentPage] = useState(1)
+  const { addItem } = useCart()
   const productsPerPage = 12
 
   // Filtrar produtos por categoria
@@ -165,6 +168,17 @@ export function ProductGrid({ category, searchParams }: ProductGridProps) {
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
   const startIndex = (currentPage - 1) * productsPerPage
   const paginatedProducts = filteredProducts.slice(startIndex, startIndex + productsPerPage)
+
+  const handleAddToCart = (product: any) => {
+    addItem({
+      id: product.id.toString(),
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category,
+    })
+    toast.success("Produto adicionado ao carrinho!")
+  }
 
   return (
     <div>
@@ -244,7 +258,11 @@ export function ProductGrid({ category, searchParams }: ProductGridProps) {
                   )}
                 </div>
 
-                <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white" size="sm">
+                <Button
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                  size="sm"
+                  onClick={() => handleAddToCart(product)}
+                >
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   Adicionar
                 </Button>

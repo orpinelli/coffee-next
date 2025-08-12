@@ -4,7 +4,11 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw } from "lucide-react"
+import { useCart } from "@/contexts/cart-context"
+import { useAuth } from "@/contexts/auth-context"
+import { useRouter } from "next/navigation"
+import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, Check } from "lucide-react"
+import { toast } from "sonner"
 
 interface Product {
   id: number
@@ -19,6 +23,8 @@ interface Product {
   sku: string
   availability: string
   description: string
+  image: string
+  category: string
 }
 
 interface ProductInfoProps {
@@ -28,10 +34,51 @@ interface ProductInfoProps {
 export function ProductInfo({ product }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1)
   const [isFavorite, setIsFavorite] = useState(false)
+  const [isAddingToCart, setIsAddingToCart] = useState(false)
+  const [justAdded, setJustAdded] = useState(false)
+  const { addItem } = useCart()
+  const { user } = useAuth()
+  const router = useRouter()
 
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0
+
+  const handleAddToCart = async () => {
+    setIsAddingToCart(true)
+
+    // Simulate loading time for better UX
+    await new Promise((resolve) => setTimeout(resolve, 800))
+
+    for (let i = 0; i < quantity; i++) {
+      addItem({
+        id: product.id.toString(),
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        category: product.category,
+      })
+    }
+
+    setIsAddingToCart(false)
+    setJustAdded(true)
+
+    toast.success(`${quantity} ${quantity === 1 ? "item adicionado" : "itens adicionados"} ao carrinho!`, {
+      duration: 3000,
+    })
+
+    // Reset animation after 2 seconds
+    setTimeout(() => setJustAdded(false), 2000)
+  }
+
+  const handleBuyNow = () => {
+    if (!user) {
+      router.push("/login")
+      return
+    }
+    handleAddToCart()
+    router.push("/checkout")
+  }
 
   return (
     <div className="space-y-6">
@@ -109,9 +156,30 @@ export function ProductInfo({ product }: ProductInfoProps) {
         </div>
 
         <div className="flex gap-3">
-          <Button className="flex-1 bg-orange-600 hover:bg-orange-700 text-white" size="lg">
-            <ShoppingCart className="h-5 w-5 mr-2" />
-            Adicionar ao Carrinho
+          <Button
+            className={`flex-1 text-white transition-all duration-300 ${
+              justAdded ? "bg-green-600 hover:bg-green-700" : "bg-orange-600 hover:bg-orange-700"
+            }`}
+            size="lg"
+            onClick={handleAddToCart}
+            disabled={isAddingToCart}
+          >
+            {isAddingToCart ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                Adicionando...
+              </>
+            ) : justAdded ? (
+              <>
+                <Check className="h-5 w-5 mr-2" />
+                Adicionado!
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="h-5 w-5 mr-2" />
+                Adicionar ao Carrinho
+              </>
+            )}
           </Button>
           <Button
             variant="outline"
@@ -126,7 +194,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
           </Button>
         </div>
 
-        <Button variant="outline" className="w-full bg-transparent" size="lg">
+        <Button variant="outline" className="w-full bg-transparent" size="lg" onClick={handleBuyNow}>
           Comprar Agora
         </Button>
       </div>

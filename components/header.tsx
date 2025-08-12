@@ -1,17 +1,33 @@
 "use client"
 
 import { useState } from "react"
-import { Search, ShoppingCart, Menu, X, Phone, Mail } from "lucide-react"
+import { Search, ShoppingCart, Menu, X, Phone, Mail, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import Link from "next/link"
+import { useCart } from "@/contexts/cart-context"
+import { useAuth } from "@/contexts/auth-context"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { itemCount } = useCart()
+  const { user, logout } = useAuth()
+
+  const handleLogout = () => {
+    logout()
+    setIsMenuOpen(false)
+  }
 
   return (
-    <header className="bg-white shadow-sm border-b">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm border-b">
       {/* Top bar */}
       <div className="bg-orange-600 text-white py-2">
         <div className="container mx-auto px-4 flex justify-between items-center text-sm">
@@ -57,14 +73,49 @@ export function Header() {
             </div>
           </div>
 
-          {/* Cart and Menu */}
+          {/* Cart, User and Menu */}
           <div className="flex items-center gap-4">
+            {/* Cart */}
             <Button variant="outline" className="relative bg-transparent" asChild>
               <Link href="/carrinho">
                 <ShoppingCart className="h-5 w-5" />
-                <Badge className="absolute -top-2 -right-2 bg-orange-600 text-white">3</Badge>
+                {itemCount > 0 && (
+                  <Badge className="absolute -top-2 -right-2 bg-orange-600 text-white animate-pulse">{itemCount}</Badge>
+                )}
               </Link>
             </Button>
+
+            {/* User Menu */}
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="bg-transparent">
+                    <User className="h-5 w-5 mr-2" />
+                    <span className="hidden sm:inline">{user.name.split(" ")[0]}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link href="/perfil">Meu Perfil</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/pedidos">Meus Pedidos</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sair
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="outline" className="bg-transparent" asChild>
+                <Link href="/login">
+                  <User className="h-5 w-5 mr-2" />
+                  <span className="hidden sm:inline">Entrar</span>
+                </Link>
+              </Button>
+            )}
 
             {/* Mobile menu button */}
             <Button
