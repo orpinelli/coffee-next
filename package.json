@@ -6,7 +6,8 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "format": "biome check --write ."
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -61,6 +62,7 @@
     "zod": "3.25.67"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.1.4",
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22",
     "@types/react": "^19",

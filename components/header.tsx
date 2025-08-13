@@ -61,17 +61,20 @@ export function Header() {
 
           {/* Search bar - Desktop */}
           <div className="hidden md:flex flex-1 max-w-2xl mx-8">
-            <div className="relative w-full">
-              <Input
-                type="search"
-                placeholder="Buscar produtos, ferramentas, materiais..."
-                className="w-full pl-4 pr-12 py-3 border-2 border-slate-200 focus:border-orange-500"
-              />
-              <Button size="sm" className="absolute right-1 top-1 bg-orange-600 hover:bg-orange-700">
-                <Search className="h-4 w-4" />
-              </Button>
-            </div>
+          <div className="relative w-full">
+            <Input
+              type="search"
+              placeholder="Buscar produtos, ferramentas, materiais..."
+              className="w-full pl-4 pr-12 py-3 border-2 border-slate-200 focus:border-orange-500"
+            />
+            <Button
+              size="sm"
+              className="absolute right-1 top-1/2 -translate-y-1/2 bg-orange-600 hover:bg-orange-700 size-9"
+            >
+              <Search className="h-5 w-5" />
+            </Button>
           </div>
+        </div>
 
           {/* Cart, User and Menu */}
           <div className="flex items-center gap-4">
