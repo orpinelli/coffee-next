@@ -1,232 +1,284 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { useCart } from "@/contexts/cart-context"
-import { useAuth } from "@/contexts/auth-context"
-import { useRouter } from "next/navigation"
-import { Star, ShoppingCart, Heart, Share2, Truck, Shield, RotateCcw, Check } from "lucide-react"
-import { toast } from "sonner"
+import {
+	Check,
+	Heart,
+	RotateCcw,
+	Share2,
+	Shield,
+	ShoppingCart,
+	Star,
+	Truck,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/contexts/auth-context";
+import { useCart } from "@/contexts/cart-context";
 
 interface Product {
-  id: number
-  name: string
-  price: number
-  originalPrice?: number
-  rating: number
-  reviews: number
-  badge: string
-  badgeColor: string
-  brand: string
-  sku: string
-  availability: string
-  description: string
-  image: string
-  category: string
+	id: number;
+	name: string;
+	price: number;
+	originalPrice?: number;
+	rating: number;
+	reviews: number;
+	badge: string;
+	badgeColor: string;
+	brand: string;
+	sku: string;
+	availability: string;
+	description: string;
+	image: string;
+	category: string;
 }
 
 interface ProductInfoProps {
-  product: Product
+	product: Product;
 }
 
 export function ProductInfo({ product }: ProductInfoProps) {
-  const [quantity, setQuantity] = useState(1)
-  const [isFavorite, setIsFavorite] = useState(false)
-  const [isAddingToCart, setIsAddingToCart] = useState(false)
-  const [justAdded, setJustAdded] = useState(false)
-  const { addItem } = useCart()
-  const { user } = useAuth()
-  const router = useRouter()
+	const [quantity, setQuantity] = useState(1);
+	const [isFavorite, setIsFavorite] = useState(false);
+	const [isAddingToCart, setIsAddingToCart] = useState(false);
+	const [justAdded, setJustAdded] = useState(false);
+	const { addItem } = useCart();
+	const { user } = useAuth();
+	const router = useRouter();
 
-  const discount = product.originalPrice
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-    : 0
+	const discount = product.originalPrice
+		? Math.round(
+				((product.originalPrice - product.price) / product.originalPrice) * 100,
+			)
+		: 0;
 
-  const handleAddToCart = async () => {
-    setIsAddingToCart(true)
+	const handleAddToCart = async () => {
+		setIsAddingToCart(true);
 
-    // Simulate loading time for better UX
-    await new Promise((resolve) => setTimeout(resolve, 800))
+		// Simulate loading time for better UX
+		await new Promise((resolve) => setTimeout(resolve, 800));
 
-    for (let i = 0; i < quantity; i++) {
-      addItem({
-        id: product.id.toString(),
-        name: product.name,
-        price: product.price,
-        image: product.image,
-        category: product.category,
-      })
-    }
+		for (let i = 0; i < quantity; i++) {
+			addItem({
+				id: product.id.toString(),
+				name: product.name,
+				price: product.price,
+				image: product.image,
+				category: product.category,
+			});
+		}
 
-    setIsAddingToCart(false)
-    setJustAdded(true)
+		setIsAddingToCart(false);
+		setJustAdded(true);
 
-    toast.success(`${quantity} ${quantity === 1 ? "item adicionado" : "itens adicionados"} ao carrinho!`, {
-      duration: 3000,
-    })
+		toast.success(
+			`${quantity} ${quantity === 1 ? "item adicionado" : "itens adicionados"} ao carrinho!`,
+			{
+				duration: 3000,
+			},
+		);
 
-    // Reset animation after 2 seconds
-    setTimeout(() => setJustAdded(false), 2000)
-  }
+		// Reset animation after 2 seconds
+		setTimeout(() => setJustAdded(false), 2000);
+	};
 
-  const handleBuyNow = () => {
-    if (!user) {
-      router.push("/login")
-      return
-    }
-    handleAddToCart()
-    router.push("/checkout")
-  }
+	const handleBuyNow = () => {
+		if (!user) {
+			router.push("/login");
+			return;
+		}
+		handleAddToCart();
+		router.push("/checkout");
+	};
 
-  return (
-    <div className="space-y-6">
-      {/* Badge e Marca */}
-      <div className="flex items-center gap-3">
-        <Badge className={`${product.badgeColor} text-white`}>{product.badge}</Badge>
-        <span className="text-sm text-slate-600">Marca: {product.brand}</span>
-      </div>
+	return (
+		<div className="space-y-6">
+			{/* Badge e Marca */}
+			<div className="flex items-center gap-3">
+				<Badge className={`${product.badgeColor} text-white`}>
+					{product.badge}
+				</Badge>
+				<span className="text-sm text-slate-600">Marca: {product.brand}</span>
+			</div>
 
-      {/* Nome do Produto */}
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">{product.name}</h1>
-        <p className="text-sm text-slate-500">SKU: {product.sku}</p>
-      </div>
+			{/* Nome do Produto */}
+			<div>
+				<h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
+					{product.name}
+				</h1>
+				<p className="text-sm text-slate-500">SKU: {product.sku}</p>
+			</div>
 
-      {/* Avaliações */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-1">
-          {[...Array(5)].map((_, i) => (
-            <Star
-              key={i}
-              className={`h-5 w-5 ${
-                i < Math.floor(product.rating) ? "text-yellow-400 fill-current" : "text-slate-300"
-              }`}
-            />
-          ))}
-        </div>
-        <span className="text-sm text-slate-600">
-          {product.rating} ({product.reviews} avaliações)
-        </span>
-      </div>
+			{/* Avaliações */}
+			<div className="flex items-center gap-4">
+				<div className="flex items-center gap-1">
+					{[...Array(5)].map((_, i) => (
+						<Star
+							key={i}
+							className={`h-5 w-5 ${
+								i < Math.floor(product.rating)
+									? "text-yellow-400 fill-current"
+									: "text-slate-300"
+							}`}
+						/>
+					))}
+				</div>
+				<span className="text-sm text-slate-600">
+					{product.rating} ({product.reviews} avaliações)
+				</span>
+			</div>
 
-      {/* Preços */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          <span className="text-3xl font-bold text-slate-900">R$ {product.price.toFixed(2).replace(".", ",")}</span>
-          {product.originalPrice && (
-            <>
-              <span className="text-lg text-slate-500 line-through">
-                R$ {product.originalPrice.toFixed(2).replace(".", ",")}
-              </span>
-              <Badge className="bg-red-500 text-white">-{discount}%</Badge>
-            </>
-          )}
-        </div>
-        <p className="text-sm text-green-600 font-medium">
-          Em até 12x de R$ {(product.price / 12).toFixed(2).replace(".", ",")} sem juros
-        </p>
-      </div>
+			{/* Preços */}
+			<div className="space-y-2">
+				<div className="flex items-center gap-3">
+					<span className="text-3xl font-bold text-slate-900">
+						R$ {product.price.toFixed(2).replace(".", ",")}
+					</span>
+					{product.originalPrice && (
+						<>
+							<span className="text-lg text-slate-500 line-through">
+								R$ {product.originalPrice.toFixed(2).replace(".", ",")}
+							</span>
+							<Badge className="bg-red-500 text-white">-{discount}%</Badge>
+						</>
+					)}
+				</div>
+				<p className="text-sm text-green-600 font-medium">
+					Em até 12x de R$ {(product.price / 12).toFixed(2).replace(".", ",")}{" "}
+					sem juros
+				</p>
+			</div>
 
-      {/* Disponibilidade */}
-      <div className="flex items-center gap-2">
-        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-        <span className="text-green-600 font-medium">{product.availability}</span>
-      </div>
+			{/* Disponibilidade */}
+			<div className="flex items-center gap-2">
+				<div className="w-3 h-3 bg-green-500 rounded-full"></div>
+				<span className="text-green-600 font-medium">
+					{product.availability}
+				</span>
+			</div>
 
-      {/* Descrição */}
-      <div>
-        <p className="text-slate-700 leading-relaxed">{product.description}</p>
-      </div>
+			{/* Descrição */}
+			<div>
+				<p className="text-slate-700 leading-relaxed">{product.description}</p>
+			</div>
 
-      {/* Quantidade e Ações */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-4">
-          <label className="text-sm font-medium text-slate-700">Quantidade:</label>
-          <div className="flex items-center border border-slate-300 rounded-lg">
-            <Button variant="ghost" size="sm" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3">
-              -
-            </Button>
-            <span className="px-4 py-2 text-center min-w-[60px]">{quantity}</span>
-            <Button variant="ghost" size="sm" onClick={() => setQuantity(quantity + 1)} className="px-3">
-              +
-            </Button>
-          </div>
-        </div>
+			{/* Quantidade e Ações */}
+			<div className="space-y-4">
+				<div className="flex items-center gap-4">
+					<label className="text-sm font-medium text-slate-700">
+						Quantidade:
+					</label>
+					<div className="flex items-center border border-slate-300 rounded-lg">
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={() => setQuantity(Math.max(1, quantity - 1))}
+							className="px-3"
+						>
+							-
+						</Button>
+						<span className="px-4 py-2 text-center min-w-[60px]">
+							{quantity}
+						</span>
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={() => setQuantity(quantity + 1)}
+							className="px-3"
+						>
+							+
+						</Button>
+					</div>
+				</div>
 
-        <div className="flex gap-3">
-          <Button
-            className={`flex-1 text-white transition-all duration-300 ${
-              justAdded ? "bg-green-600 hover:bg-green-700" : "bg-orange-600 hover:bg-orange-700"
-            }`}
-            size="lg"
-            onClick={handleAddToCart}
-            disabled={isAddingToCart}
-          >
-            {isAddingToCart ? (
-              <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                Adicionando...
-              </>
-            ) : justAdded ? (
-              <>
-                <Check className="h-5 w-5 mr-2" />
-                Adicionado!
-              </>
-            ) : (
-              <>
-                <ShoppingCart className="h-5 w-5 mr-2" />
-                Adicionar ao Carrinho
-              </>
-            )}
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => setIsFavorite(!isFavorite)}
-            className={isFavorite ? "text-red-500 border-red-500" : ""}
-          >
-            <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
-          </Button>
-          <Button variant="outline" size="lg">
-            <Share2 className="h-5 w-5" />
-          </Button>
-        </div>
+				<div className="flex gap-3">
+					<Button
+						className={`flex-1 text-white transition-all duration-300 ${
+							justAdded
+								? "bg-green-600 hover:bg-green-700"
+								: "bg-orange-600 hover:bg-orange-700"
+						}`}
+						size="lg"
+						onClick={handleAddToCart}
+						disabled={isAddingToCart}
+					>
+						{isAddingToCart ? (
+							<>
+								<div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+								Adicionando...
+							</>
+						) : justAdded ? (
+							<>
+								<Check className="h-5 w-5 mr-2" />
+								Adicionado!
+							</>
+						) : (
+							<>
+								<ShoppingCart className="h-5 w-5 mr-2" />
+								Adicionar ao Carrinho
+							</>
+						)}
+					</Button>
+					<Button
+						variant="outline"
+						size="lg"
+						onClick={() => setIsFavorite(!isFavorite)}
+						className={isFavorite ? "text-red-500 border-red-500" : ""}
+					>
+						<Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
+					</Button>
+					<Button variant="outline" size="lg">
+						<Share2 className="h-5 w-5" />
+					</Button>
+				</div>
 
-        <Button variant="outline" className="w-full bg-transparent" size="lg" onClick={handleBuyNow}>
-          Comprar Agora
-        </Button>
-      </div>
+				<Button
+					variant="outline"
+					className="w-full bg-transparent"
+					size="lg"
+					onClick={handleBuyNow}
+				>
+					Comprar Agora
+				</Button>
+			</div>
 
-      {/* Benefícios */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <Truck className="h-5 w-5 text-green-600" />
-              <div>
-                <p className="font-medium text-slate-900">Frete Grátis</p>
-                <p className="text-sm text-slate-600">Para compras acima de R$ 199</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Shield className="h-5 w-5 text-blue-600" />
-              <div>
-                <p className="font-medium text-slate-900">Garantia</p>
-                <p className="text-sm text-slate-600">12 meses de garantia do fabricante</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <RotateCcw className="h-5 w-5 text-orange-600" />
-              <div>
-                <p className="font-medium text-slate-900">Troca Fácil</p>
-                <p className="text-sm text-slate-600">7 dias para trocar ou devolver</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
+			{/* Benefícios */}
+			<Card>
+				<CardContent className="p-4">
+					<div className="space-y-3">
+						<div className="flex items-center gap-3">
+							<Truck className="h-5 w-5 text-green-600" />
+							<div>
+								<p className="font-medium text-slate-900">Frete Grátis</p>
+								<p className="text-sm text-slate-600">
+									Para compras acima de R$ 199
+								</p>
+							</div>
+						</div>
+						<div className="flex items-center gap-3">
+							<Shield className="h-5 w-5 text-blue-600" />
+							<div>
+								<p className="font-medium text-slate-900">Garantia</p>
+								<p className="text-sm text-slate-600">
+									12 meses de garantia do fabricante
+								</p>
+							</div>
+						</div>
+						<div className="flex items-center gap-3">
+							<RotateCcw className="h-5 w-5 text-orange-600" />
+							<div>
+								<p className="font-medium text-slate-900">Troca Fácil</p>
+								<p className="text-sm text-slate-600">
+									7 dias para trocar ou devolver
+								</p>
+							</div>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+		</div>
+	);
 }

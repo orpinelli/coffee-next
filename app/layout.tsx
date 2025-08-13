@@ -1,45 +1,48 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Inter, Roboto_Slab } from "next/font/google"
-import "./globals.css"
-import { CartProvider } from "@/contexts/cart-context"
-import { AuthProvider } from "@/contexts/auth-context"
-import { Toaster } from "@/components/ui/sonner"
+import type { Metadata } from "next";
+import { Inter, Roboto_Slab } from "next/font/google";
+import type React from "react";
+import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/contexts/auth-context";
+import { CartProvider } from "@/contexts/cart-context";
 
 const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-})
+	subsets: ["latin"],
+	display: "swap",
+	variable: "--font-inter",
+});
 
 const robotoSlab = Roboto_Slab({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-roboto-slab",
-})
+	subsets: ["latin"],
+	display: "swap",
+	variable: "--font-roboto-slab",
+});
 
 export const metadata: Metadata = {
-  title: "PradooBuild - Materiais de Construção e Ferramentas",
-  description:
-    "Sua loja especializada em materiais de construção, ferramentas e equipamentos profissionais. Os melhores preços e qualidade garantida.",
-  generator: "v0.app",
-}
+	title: "Comercial Prado - Materiais de Construção e Ferramentas",
+	description:
+		"Sua loja especializada em materiais de construção, ferramentas e equipamentos profissionais. Os melhores preços e qualidade garantida.",
+	generator: "v0.app",
+};
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode
+	children: React.ReactNode;
 }>) {
-  return (
-    <html lang="pt-BR" className={`${inter.variable} ${robotoSlab.variable} antialiased`}>
-      <body>
-        <AuthProvider>
-          <CartProvider>
-            {children}
-            <Toaster />
-          </CartProvider>
-        </AuthProvider>
-      </body>
-    </html>
-  )
+	return (
+		<html
+			lang="pt-BR"
+			className={`${inter.variable} ${robotoSlab.variable} antialiased`}
+		>
+			<body>
+				<AuthProvider>
+					<CartProvider>
+						{children}
+						<Toaster />
+					</CartProvider>
+				</AuthProvider>
+			</body>
+		</html>
+	);
 }

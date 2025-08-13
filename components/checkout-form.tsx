@@ -1,449 +1,506 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Separator } from "@/components/ui/separator"
-import { useAuth } from "@/contexts/auth-context"
-import { useCart } from "@/contexts/cart-context"
-import { User, MapPin, Truck, Shield } from "lucide-react"
+import { MapPin, Shield, Truck, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/contexts/auth-context";
+import { useCart } from "@/contexts/cart-context";
 
 const states = [
-  "AC",
-  "AL",
-  "AP",
-  "AM",
-  "BA",
-  "CE",
-  "DF",
-  "ES",
-  "GO",
-  "MA",
-  "MT",
-  "MS",
-  "MG",
-  "PA",
-  "PB",
-  "PR",
-  "PE",
-  "PI",
-  "RJ",
-  "RN",
-  "RS",
-  "RO",
-  "RR",
-  "SC",
-  "SP",
-  "SE",
-  "TO",
-]
+	"AC",
+	"AL",
+	"AP",
+	"AM",
+	"BA",
+	"CE",
+	"DF",
+	"ES",
+	"GO",
+	"MA",
+	"MT",
+	"MS",
+	"MG",
+	"PA",
+	"PB",
+	"PR",
+	"PE",
+	"PI",
+	"RJ",
+	"RN",
+	"RS",
+	"RO",
+	"RR",
+	"SC",
+	"SP",
+	"SE",
+	"TO",
+];
 
 const shippingOptions = [
-  {
-    id: "sedex",
-    name: "SEDEX",
-    description: "Entrega em 2-3 dias úteis",
-    price: 25.9,
-    icon: Truck,
-  },
-  {
-    id: "pac",
-    name: "PAC",
-    description: "Entrega em 5-7 dias úteis",
-    price: 15.9,
-    icon: Truck,
-  },
-  {
-    id: "expressa",
-    name: "Entrega Expressa",
-    description: "Entrega no mesmo dia (apenas SP capital)",
-    price: 35.9,
-    icon: Truck,
-  },
-]
+	{
+		id: "sedex",
+		name: "SEDEX",
+		description: "Entrega em 2-3 dias úteis",
+		price: 25.9,
+		icon: Truck,
+	},
+	{
+		id: "pac",
+		name: "PAC",
+		description: "Entrega em 5-7 dias úteis",
+		price: 15.9,
+		icon: Truck,
+	},
+	{
+		id: "expressa",
+		name: "Entrega Expressa",
+		description: "Entrega no mesmo dia (apenas SP capital)",
+		price: 35.9,
+		icon: Truck,
+	},
+];
 
 export function CheckoutForm() {
-  const [currentStep, setCurrentStep] = useState(1)
-  const { user, updateProfile } = useAuth()
-  const { items } = useCart()
-  const router = useRouter()
+	const [currentStep, setCurrentStep] = useState(1);
+	const { user, updateProfile } = useAuth();
+	const { items } = useCart();
+	const router = useRouter();
 
-  const [formData, setFormData] = useState({
-    // Dados pessoais
-    name: user?.name || "",
-    email: user?.email || "",
-    phone: user?.phone || "",
-    cpf: user?.cpf || "",
+	const [formData, setFormData] = useState({
+		// Dados pessoais
+		name: user?.name || "",
+		email: user?.email || "",
+		phone: user?.phone || "",
+		cpf: user?.cpf || "",
 
-    // Endereço
-    cep: user?.address?.zipCode || "",
-    street: user?.address?.street || "",
-    number: user?.address?.number || "",
-    complement: user?.address?.complement || "",
-    neighborhood: user?.address?.neighborhood || "",
-    city: user?.address?.city || "",
-    state: user?.address?.state || "",
+		// Endereço
+		cep: user?.address?.zipCode || "",
+		street: user?.address?.street || "",
+		number: user?.address?.number || "",
+		complement: user?.address?.complement || "",
+		neighborhood: user?.address?.neighborhood || "",
+		city: user?.address?.city || "",
+		state: user?.address?.state || "",
 
-    // Frete
-    shipping: "",
+		// Frete
+		shipping: "",
 
-    // Termos
-    acceptTerms: false,
-    newsletter: false,
-  })
+		// Termos
+		acceptTerms: false,
+		newsletter: false,
+	});
 
-  const [isLoadingCep, setIsLoadingCep] = useState(false)
+	const [isLoadingCep, setIsLoadingCep] = useState(false);
 
-  const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+	const handleInputChange = (field: string, value: string | boolean) => {
+		setFormData((prev) => ({ ...prev, [field]: value }));
+	};
 
-  const searchCep = async (cep: string) => {
-    if (cep.length === 8) {
-      setIsLoadingCep(true)
-      // Simular busca de CEP
-      setTimeout(() => {
-        setFormData((prev) => ({
-          ...prev,
-          street: "Rua das Flores",
-          neighborhood: "Centro",
-          city: "São Paulo",
-          state: "SP",
-        }))
-        setIsLoadingCep(false)
-      }, 1000)
-    }
-  }
+	const searchCep = async (cep: string) => {
+		if (cep.length === 8) {
+			setIsLoadingCep(true);
+			// Simular busca de CEP
+			setTimeout(() => {
+				setFormData((prev) => ({
+					...prev,
+					street: "Rua das Flores",
+					neighborhood: "Centro",
+					city: "São Paulo",
+					state: "SP",
+				}));
+				setIsLoadingCep(false);
+			}, 1000);
+		}
+	};
 
-  const nextStep = () => {
-    if (currentStep < 2) {
-      setCurrentStep(currentStep + 1)
-    }
-  }
+	const nextStep = () => {
+		if (currentStep < 2) {
+			setCurrentStep(currentStep + 1);
+		}
+	};
 
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1)
-    }
-  }
+	const prevStep = () => {
+		if (currentStep > 1) {
+			setCurrentStep(currentStep - 1);
+		}
+	};
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
 
-    // Update user profile with address data
-    if (user) {
-      updateProfile({
-        name: formData.name,
-        phone: formData.phone,
-        cpf: formData.cpf,
-        address: {
-          street: formData.street,
-          number: formData.number,
-          complement: formData.complement,
-          neighborhood: formData.neighborhood,
-          city: formData.city,
-          state: formData.state,
-          zipCode: formData.cep,
-        },
-      })
-    }
+		// Update user profile with address data
+		if (user) {
+			updateProfile({
+				name: formData.name,
+				phone: formData.phone,
+				cpf: formData.cpf,
+				address: {
+					street: formData.street,
+					number: formData.number,
+					complement: formData.complement,
+					neighborhood: formData.neighborhood,
+					city: formData.city,
+					state: formData.state,
+					zipCode: formData.cep,
+				},
+			});
+		}
 
-    // Redirect to payment page
-    router.push("/pagamento")
-  }
+		// Redirect to payment page
+		router.push("/pagamento");
+	};
 
-  // Redirect if not logged in or cart is empty
-  if (!user || items.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-gray-600">
-          {!user ? "Você precisa estar logado para continuar." : "Seu carrinho está vazio."}
-        </p>
-      </div>
-    )
-  }
+	// Redirect if not logged in or cart is empty
+	if (!user || items.length === 0) {
+		return (
+			<div className="text-center py-8">
+				<p className="text-gray-600">
+					{!user
+						? "Você precisa estar logado para continuar."
+						: "Seu carrinho está vazio."}
+				</p>
+			</div>
+		);
+	}
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Progress Steps */}
-      <div className="flex items-center justify-between mb-8">
-        {[1, 2].map((step) => (
-          <div key={step} className="flex items-center">
-            <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
-                step <= currentStep ? "bg-orange-600 text-white" : "bg-slate-200 text-slate-600"
-              }`}
-            >
-              {step}
-            </div>
-            <div className="ml-3">
-              <p className={`text-sm font-medium ${step <= currentStep ? "text-orange-600" : "text-slate-600"}`}>
-                {step === 1 ? "Dados Pessoais" : "Entrega"}
-              </p>
-            </div>
-            {step < 2 && <div className={`w-16 h-0.5 mx-4 ${step < currentStep ? "bg-orange-600" : "bg-slate-200"}`} />}
-          </div>
-        ))}
-      </div>
+	return (
+		<form onSubmit={handleSubmit} className="space-y-6">
+			{/* Progress Steps */}
+			<div className="flex items-center justify-between mb-8">
+				{[1, 2].map((step) => (
+					<div key={step} className="flex items-center">
+						<div
+							className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
+								step <= currentStep
+									? "bg-orange-600 text-white"
+									: "bg-slate-200 text-slate-600"
+							}`}
+						>
+							{step}
+						</div>
+						<div className="ml-3">
+							<p
+								className={`text-sm font-medium ${step <= currentStep ? "text-orange-600" : "text-slate-600"}`}
+							>
+								{step === 1 ? "Dados Pessoais" : "Entrega"}
+							</p>
+						</div>
+						{step < 2 && (
+							<div
+								className={`w-16 h-0.5 mx-4 ${step < currentStep ? "bg-orange-600" : "bg-slate-200"}`}
+							/>
+						)}
+					</div>
+				))}
+			</div>
 
-      {/* Step 1: Dados Pessoais */}
-      {currentStep === 1 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Dados Pessoais
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">Nome Completo *</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                  placeholder="Seu nome completo"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="email">E-mail *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="seu@email.com"
-                  required
-                  disabled
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="phone">Telefone *</Label>
-                <Input
-                  id="phone"
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange("phone", e.target.value)}
-                  placeholder="(11) 99999-9999"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="cpf">CPF *</Label>
-                <Input
-                  id="cpf"
-                  value={formData.cpf}
-                  onChange={(e) => handleInputChange("cpf", e.target.value)}
-                  placeholder="000.000.000-00"
-                  required
-                />
-              </div>
-            </div>
+			{/* Step 1: Dados Pessoais */}
+			{currentStep === 1 && (
+				<Card>
+					<CardHeader>
+						<CardTitle className="flex items-center gap-2">
+							<User className="h-5 w-5" />
+							Dados Pessoais
+						</CardTitle>
+					</CardHeader>
+					<CardContent className="space-y-4">
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div>
+								<Label htmlFor="name">Nome Completo *</Label>
+								<Input
+									id="name"
+									value={formData.name}
+									onChange={(e) => handleInputChange("name", e.target.value)}
+									placeholder="Seu nome completo"
+									required
+								/>
+							</div>
+							<div>
+								<Label htmlFor="email">E-mail *</Label>
+								<Input
+									id="email"
+									type="email"
+									value={formData.email}
+									onChange={(e) => handleInputChange("email", e.target.value)}
+									placeholder="seu@email.com"
+									required
+									disabled
+								/>
+							</div>
+						</div>
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div>
+								<Label htmlFor="phone">Telefone *</Label>
+								<Input
+									id="phone"
+									value={formData.phone}
+									onChange={(e) => handleInputChange("phone", e.target.value)}
+									placeholder="(11) 99999-9999"
+									required
+								/>
+							</div>
+							<div>
+								<Label htmlFor="cpf">CPF *</Label>
+								<Input
+									id="cpf"
+									value={formData.cpf}
+									onChange={(e) => handleInputChange("cpf", e.target.value)}
+									placeholder="000.000.000-00"
+									required
+								/>
+							</div>
+						</div>
 
-            <Separator className="my-6" />
+						<Separator className="my-6" />
 
-            <div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                <MapPin className="h-5 w-5" />
-                Endereço de Entrega
-              </h3>
-            </div>
+						<div>
+							<h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+								<MapPin className="h-5 w-5" />
+								Endereço de Entrega
+							</h3>
+						</div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="cep">CEP *</Label>
-                <Input
-                  id="cep"
-                  value={formData.cep}
-                  onChange={(e) => {
-                    handleInputChange("cep", e.target.value)
-                    if (e.target.value.replace(/\D/g, "").length === 8) {
-                      searchCep(e.target.value.replace(/\D/g, ""))
-                    }
-                  }}
-                  placeholder="00000-000"
-                  required
-                />
-                {isLoadingCep && <p className="text-sm text-slate-500 mt-1">Buscando CEP...</p>}
-              </div>
-              <div className="md:col-span-2">
-                <Label htmlFor="street">Endereço *</Label>
-                <Input
-                  id="street"
-                  value={formData.street}
-                  onChange={(e) => handleInputChange("street", e.target.value)}
-                  placeholder="Rua, Avenida..."
-                  required
-                />
-              </div>
-            </div>
+						<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+							<div>
+								<Label htmlFor="cep">CEP *</Label>
+								<Input
+									id="cep"
+									value={formData.cep}
+									onChange={(e) => {
+										handleInputChange("cep", e.target.value);
+										if (e.target.value.replace(/\D/g, "").length === 8) {
+											searchCep(e.target.value.replace(/\D/g, ""));
+										}
+									}}
+									placeholder="00000-000"
+									required
+								/>
+								{isLoadingCep && (
+									<p className="text-sm text-slate-500 mt-1">Buscando CEP...</p>
+								)}
+							</div>
+							<div className="md:col-span-2">
+								<Label htmlFor="street">Endereço *</Label>
+								<Input
+									id="street"
+									value={formData.street}
+									onChange={(e) => handleInputChange("street", e.target.value)}
+									placeholder="Rua, Avenida..."
+									required
+								/>
+							</div>
+						</div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <Label htmlFor="number">Número *</Label>
-                <Input
-                  id="number"
-                  value={formData.number}
-                  onChange={(e) => handleInputChange("number", e.target.value)}
-                  placeholder="123"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="complement">Complemento</Label>
-                <Input
-                  id="complement"
-                  value={formData.complement}
-                  onChange={(e) => handleInputChange("complement", e.target.value)}
-                  placeholder="Apto, Bloco..."
-                />
-              </div>
-              <div>
-                <Label htmlFor="neighborhood">Bairro *</Label>
-                <Input
-                  id="neighborhood"
-                  value={formData.neighborhood}
-                  onChange={(e) => handleInputChange("neighborhood", e.target.value)}
-                  placeholder="Centro"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="state">Estado *</Label>
-                <Select value={formData.state} onValueChange={(value) => handleInputChange("state", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="UF" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {states.map((state) => (
-                      <SelectItem key={state} value={state}>
-                        {state}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+						<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+							<div>
+								<Label htmlFor="number">Número *</Label>
+								<Input
+									id="number"
+									value={formData.number}
+									onChange={(e) => handleInputChange("number", e.target.value)}
+									placeholder="123"
+									required
+								/>
+							</div>
+							<div>
+								<Label htmlFor="complement">Complemento</Label>
+								<Input
+									id="complement"
+									value={formData.complement}
+									onChange={(e) =>
+										handleInputChange("complement", e.target.value)
+									}
+									placeholder="Apto, Bloco..."
+								/>
+							</div>
+							<div>
+								<Label htmlFor="neighborhood">Bairro *</Label>
+								<Input
+									id="neighborhood"
+									value={formData.neighborhood}
+									onChange={(e) =>
+										handleInputChange("neighborhood", e.target.value)
+									}
+									placeholder="Centro"
+									required
+								/>
+							</div>
+							<div>
+								<Label htmlFor="state">Estado *</Label>
+								<Select
+									value={formData.state}
+									onValueChange={(value) => handleInputChange("state", value)}
+								>
+									<SelectTrigger>
+										<SelectValue placeholder="UF" />
+									</SelectTrigger>
+									<SelectContent>
+										{states.map((state) => (
+											<SelectItem key={state} value={state}>
+												{state}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+						</div>
 
-            <div>
-              <Label htmlFor="city">Cidade *</Label>
-              <Input
-                id="city"
-                value={formData.city}
-                onChange={(e) => handleInputChange("city", e.target.value)}
-                placeholder="São Paulo"
-                required
-              />
-            </div>
-          </CardContent>
-        </Card>
-      )}
+						<div>
+							<Label htmlFor="city">Cidade *</Label>
+							<Input
+								id="city"
+								value={formData.city}
+								onChange={(e) => handleInputChange("city", e.target.value)}
+								placeholder="São Paulo"
+								required
+							/>
+						</div>
+					</CardContent>
+				</Card>
+			)}
 
-      {/* Step 2: Entrega */}
-      {currentStep === 2 && (
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Truck className="h-5 w-5" />
-                Opções de Entrega
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <RadioGroup value={formData.shipping} onValueChange={(value) => handleInputChange("shipping", value)}>
-                <div className="space-y-4">
-                  {shippingOptions.map((option) => {
-                    const IconComponent = option.icon
-                    return (
-                      <div
-                        key={option.id}
-                        className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-slate-50"
-                      >
-                        <RadioGroupItem value={option.id} id={option.id} />
-                        <IconComponent className="h-5 w-5 text-slate-600" />
-                        <div className="flex-1">
-                          <Label htmlFor={option.id} className="font-medium cursor-pointer">
-                            {option.name}
-                          </Label>
-                          <p className="text-sm text-slate-600">{option.description}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-medium">R$ {option.price.toFixed(2).replace(".", ",")}</p>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </RadioGroup>
-            </CardContent>
-          </Card>
+			{/* Step 2: Entrega */}
+			{currentStep === 2 && (
+				<div className="space-y-6">
+					<Card>
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2">
+								<Truck className="h-5 w-5" />
+								Opções de Entrega
+							</CardTitle>
+						</CardHeader>
+						<CardContent>
+							<RadioGroup
+								value={formData.shipping}
+								onValueChange={(value) => handleInputChange("shipping", value)}
+							>
+								<div className="space-y-4">
+									{shippingOptions.map((option) => {
+										const IconComponent = option.icon;
+										return (
+											<div
+												key={option.id}
+												className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-slate-50"
+											>
+												<RadioGroupItem value={option.id} id={option.id} />
+												<IconComponent className="h-5 w-5 text-slate-600" />
+												<div className="flex-1">
+													<Label
+														htmlFor={option.id}
+														className="font-medium cursor-pointer"
+													>
+														{option.name}
+													</Label>
+													<p className="text-sm text-slate-600">
+														{option.description}
+													</p>
+												</div>
+												<div className="text-right">
+													<p className="font-medium">
+														R$ {option.price.toFixed(2).replace(".", ",")}
+													</p>
+												</div>
+											</div>
+										);
+									})}
+								</div>
+							</RadioGroup>
+						</CardContent>
+					</Card>
 
-          {/* Termos e Condições */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-4">
-                <div className="flex items-start space-x-2">
-                  <Checkbox
-                    id="terms"
-                    checked={formData.acceptTerms}
-                    onCheckedChange={(checked) => handleInputChange("acceptTerms", checked as boolean)}
-                  />
-                  <Label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer">
-                    Li e aceito os{" "}
-                    <a href="#" className="text-orange-600 hover:underline">
-                      termos de uso
-                    </a>{" "}
-                    e{" "}
-                    <a href="#" className="text-orange-600 hover:underline">
-                      política de privacidade
-                    </a>
-                    *
-                  </Label>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <Checkbox
-                    id="newsletter"
-                    checked={formData.newsletter}
-                    onCheckedChange={(checked) => handleInputChange("newsletter", checked as boolean)}
-                  />
-                  <Label htmlFor="newsletter" className="text-sm leading-relaxed cursor-pointer">
-                    Quero receber ofertas e novidades por e-mail
-                  </Label>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+					{/* Termos e Condições */}
+					<Card>
+						<CardContent className="pt-6">
+							<div className="space-y-4">
+								<div className="flex items-start space-x-2">
+									<Checkbox
+										id="terms"
+										checked={formData.acceptTerms}
+										onCheckedChange={(checked) =>
+											handleInputChange("acceptTerms", checked as boolean)
+										}
+									/>
+									<Label
+										htmlFor="terms"
+										className="text-sm leading-relaxed cursor-pointer"
+									>
+										Li e aceito os{" "}
+										<a href="#" className="text-orange-600 hover:underline">
+											termos de uso
+										</a>{" "}
+										e{" "}
+										<a href="#" className="text-orange-600 hover:underline">
+											política de privacidade
+										</a>
+										*
+									</Label>
+								</div>
+								<div className="flex items-start space-x-2">
+									<Checkbox
+										id="newsletter"
+										checked={formData.newsletter}
+										onCheckedChange={(checked) =>
+											handleInputChange("newsletter", checked as boolean)
+										}
+									/>
+									<Label
+										htmlFor="newsletter"
+										className="text-sm leading-relaxed cursor-pointer"
+									>
+										Quero receber ofertas e novidades por e-mail
+									</Label>
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+				</div>
+			)}
 
-      {/* Navigation Buttons */}
-      <div className="flex justify-between pt-6">
-        <Button type="button" variant="outline" onClick={prevStep} disabled={currentStep === 1}>
-          Voltar
-        </Button>
+			{/* Navigation Buttons */}
+			<div className="flex justify-between pt-6">
+				<Button
+					type="button"
+					variant="outline"
+					onClick={prevStep}
+					disabled={currentStep === 1}
+				>
+					Voltar
+				</Button>
 
-        {currentStep < 2 ? (
-          <Button type="button" onClick={nextStep} className="bg-orange-600 hover:bg-orange-700">
-            Continuar
-          </Button>
-        ) : (
-          <Button type="submit" className="bg-green-600 hover:bg-green-700" disabled={!formData.acceptTerms}>
-            <Shield className="h-4 w-4 mr-2" />
-            Ir para Pagamento
-          </Button>
-        )}
-      </div>
-    </form>
-  )
+				{currentStep < 2 ? (
+					<Button
+						type="button"
+						onClick={nextStep}
+						className="bg-orange-600 hover:bg-orange-700"
+					>
+						Continuar
+					</Button>
+				) : (
+					<Button
+						type="submit"
+						className="bg-green-600 hover:bg-green-700"
+						disabled={!formData.acceptTerms}
+					>
+						<Shield className="h-4 w-4 mr-2" />
+						Ir para Pagamento
+					</Button>
+				)}
+			</div>
+		</form>
+	);
 }

@@ -1,21 +1,21 @@
-import { Header } from "@/components/header"
-import { Hero } from "@/components/hero"
-import { Categories } from "@/components/categories"
-import { FeaturedProducts } from "@/components/featured-products"
-import { Newsletter } from "@/components/newsletter"
-import { Footer } from "@/components/footer"
+import { Categories } from "@/components/categories";
+import { FeaturedProducts } from "@/components/featured-products";
+import { Footer } from "@/components/footer";
+import { Header } from "@/components/header";
+import { Hero } from "@/components/hero";
+import { Newsletter } from "@/components/newsletter";
 
 export default function HomePage() {
-  return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main>
-        <Hero />
-        <Categories />
-        <FeaturedProducts />
-        <Newsletter />
-      </main>
-      <Footer />
-    </div>
-  )
+	return (
+		<div className="min-h-screen bg-background">
+			<Header />
+			<main>
+				<Hero />
+				<Categories />
+				<FeaturedProducts />
+				<Newsletter />
+			</main>
+			<Footer />
+		</div>
+	);
 }
